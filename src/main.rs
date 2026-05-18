@@ -1,4 +1,5 @@
 use eframe::egui;
+use std::sync::Arc;
 
 /// 塔防精灵AI - 主应用结构
 /// 从 C# WinForms Form1.Designer.cs 转换而来
@@ -358,6 +359,28 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "塔防精灵AI",
         options,
-        Box::new(|_cc| Ok(Box::new(TfjlAiApp::default()))),
+        Box::new(|cc| {
+            // ========== 【核心：中文正常显示字体设置】 ==========
+            let mut fonts = egui::FontDefinitions::default();
+
+            // 安装微软雅黑
+            fonts.font_data.insert(
+                "msyh".to_string(),
+                Arc::new(egui::FontData::from_static(include_bytes!(
+                    "C:/Windows/Fonts/msyh.ttc"
+                )))
+            );
+
+            // 设置为全局默认字体
+            fonts.families.get_mut(&egui::FontFamily::Proportional).unwrap()
+                .insert(0, "msyh".to_string());
+            fonts.families.get_mut(&egui::FontFamily::Monospace).unwrap()
+                .insert(0, "msyh".to_string());
+
+            cc.egui_ctx.set_fonts(fonts);
+            // ====================================================
+
+            Ok(Box::new(TfjlAiApp::default()))
+        }),
     )
 }
